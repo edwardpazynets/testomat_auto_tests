@@ -1,4 +1,3 @@
-import re
 from playwright.sync_api import Page, expect
 
 
@@ -15,7 +14,7 @@ def test_login_example(page: Page) -> None:
 
     expect(page.locator("#content-desktop").get_by_text("Invalid Email or password.")).to_be_visible()
 
-#codegen version
+# codegen version
 # def test_example(page: Page) -> None:
 #     page.goto("https://testomat.io/")
 #     expect(page.get_by_role("link", name="AI orchestration AI")).to_be_visible()
