@@ -4,7 +4,7 @@ from playwright.sync_api import Page, expect
 
 from tests.conftest import Config
 
-TARGET_PROJECT = "python auto tests"
+TARGET_PROJECT: str = "python auto tests"
 
 
 @pytest.fixture(scope="function")
@@ -54,7 +54,33 @@ def test_create_new_project(page: Page, login):
     expect(page.get_by_text("Let's do some testing!")).to_be_visible(timeout=10000)
 
 
-def search_for_project(page: Page, TARGET_PROJECT: str):
+def test_delete_existing_project(page: Page, login, configs: Config):
+    faker = Faker()
+    project_to_delete = f"Deleted project {faker.word()}"
+
+    page.locator("#content-desktop").get_by_role("link", name="Create", exact=False).click()
+    page.locator("#project_title").fill(project_to_delete)
+    page.get_by_role("button", name='Create', exact=True).click()
+    expect(page.get_by_text("Let's do some testing!")).to_be_visible(timeout=10000)
+
+    page.goto(configs.login_url)
+    page.get_by_role("link", name="Manage", exact=False).click()
+
+    page.on("dialog", lambda dialog: dialog.accept())
+
+    project_row = page.locator("tr", has_text=project_to_delete)
+
+    project_row.locator(".bi-three-dots").dispatch_event("click")
+    delete_button = project_row.get_by_text("Delete", exact=True)
+    delete_button.wait_for(state="visible", timeout=10000)
+    delete_button.click()
+
+    page.reload()
+
+    expect(page.get_by_text(project_to_delete)).to_be_hidden(timeout=10000)
+
+
+def search_for_project(page: Page, TARGET_PROJECT):
     expect(page.get_by_role("searchbox", name='Search')).to_be_visible()
     page.locator("#content-desktop #search").fill(TARGET_PROJECT)
 
