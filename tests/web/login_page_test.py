@@ -16,3 +16,9 @@ def test_login_invalid(page: Page, configs: Config):
     login_page.is_loaded()
     login_page.login(configs.email, Faker().password(length=10))
     login_page.invalid_login_message_visible()
+
+
+def test_login_with_valid_creds(page: Page, logged_in):
+    login_page = LoginPage(page)
+
+    login_page.valid_message_visible()
