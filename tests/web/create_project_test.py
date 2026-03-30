@@ -1,21 +1,23 @@
 from faker import Faker
-from playwright.sync_api import Page
 
-from src.web.pages.CreateNewProjectPage import CreateNewProjectPage
-from src.web.pages.ProjectDetailPage import ProjectDetailPage
+from web.Application import Application
 
 
-def test_create_new_project(page: Page, logged_in):
+def test_create_new_project(logged_in, app: Application):
     fake = Faker()
     random_project_title = f"Project {fake.company()}"
 
-    (CreateNewProjectPage(page)
+    (app.create_project_page
      .open()
      .is_loaded()
      .create_new_project(random_project_title)
      .click_create())
 
-    (ProjectDetailPage(page)
-     .is_loaded().
-     empty_project_name_is(random_project_title)
+    (app.project_detail_page
+     .is_loaded()
+     .empty_project_name_is(random_project_title)
      .close_read_me())
+
+    (app.project_detail_page.side_bar
+     .is_loaded()
+     .is_active("Tests"))

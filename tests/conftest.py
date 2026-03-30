@@ -3,7 +3,9 @@ from dataclasses import dataclass
 
 import pytest
 from dotenv import load_dotenv
+from playwright.sync_api import Page
 
+from src.web.Application import Application
 from web.pages.HomePage import HomePage
 from web.pages.LoginPage import LoginPage
 
@@ -28,6 +30,11 @@ def configs():
     )
 
 
+@pytest.fixture(scope="function")
+def app(page: Page) -> Application:
+    return Application(page)
+
+
 @pytest.fixture()
 def logged_in(page, configs: Config):
     home_page = HomePage(page)
@@ -38,3 +45,8 @@ def logged_in(page, configs: Config):
     login_page = LoginPage(page)
     login_page.is_loaded()
     login_page.login(configs.email, configs.password)
+
+
+@pytest.fixture
+def target_project():
+    return "python auto tests"
