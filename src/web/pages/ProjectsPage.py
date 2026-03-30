@@ -17,7 +17,9 @@ class ProjectsPage:
         self.page.locator("#company_id").click()
         self.page.locator("#company_id").select_option("Free Projects")
 
-    # доробити деліт в окремій пейджі
+    def should_have_project(self, project_name: str):
+        expect(self.page.get_by_role("heading", name=project_name)).to_be_visible()
+
     def delete_existing_project(self, project_to_delete: str):
         project_row = self.page.locator("tr", has_text=project_to_delete)
 

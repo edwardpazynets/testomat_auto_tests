@@ -2,10 +2,13 @@ from typing import Self
 
 from playwright.sync_api import Page, expect
 
+from web.components.SideBar import SideBar
+
 
 class ProjectDetailPage:
     def __init__(self, page: Page):
         self.page = page
+        self.side_bar = SideBar(page)
         self.header = self.page.locator(".sticky-header")
         self.main_menu = self.page.locator(".mainnav-menu")
         self.filter_button = self.page.get_by_role("button").filter(has=self.page.locator(".md-icon-filter"))
