@@ -1,7 +1,7 @@
 from faker import Faker
 from playwright.sync_api import Page, expect
 
-from web.Application import Application
+from src.web.Application import Application
 
 
 def test_search_project_in_company(logged_in, app: Application, target_project):

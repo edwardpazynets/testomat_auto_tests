@@ -32,4 +32,5 @@ class CreateNewProjectPage:
     def click_create(self) -> Self:
         self.__form_container.locator("#project-create-btn input").click()
         expect(self.__form_container.locator("#project-create-btn input")).to_be_hidden(timeout=10000)
+        self.page.wait_for_url("**/projects/**", timeout=10000)
         return self

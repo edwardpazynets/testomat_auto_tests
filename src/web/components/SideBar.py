@@ -33,8 +33,8 @@ class SideBar:
         expect(self.projects).to_be_visible()
         return self
 
-    def navigate_to(self, section: str):
-        self.page.get_by_role("link", name=section).click()
+    # def navigate_to(self, section: str):
+    #     self.page.get_by_role("link", name=section).click()
 
     def is_active(self, section: str):
         link = self.menu.locator(f"a.nav-item:has-text('{section}')")
