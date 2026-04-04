@@ -1,9 +1,11 @@
+import pytest
 from faker import Faker
 
+from src.web.Application import Application
 from tests.conftest import Config
-from web.Application import Application
 
 
+@pytest.mark.smoke
 def test_login_invalid(configs: Config, app: Application):
     app.home_page.open()
     app.home_page.is_loaded()

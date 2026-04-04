@@ -2,11 +2,12 @@ from playwright.sync_api import Page, expect
 
 
 class HomePage:
-    def __init__(self, page: Page):
+    def __init__(self, page: Page, base_url: str):
         self.page = page
+        self.base_url = base_url
 
     def open(self):
-        self.page.goto("https://testomat.io/")
+        self.page.goto(self.base_url)
 
     def is_loaded(self):
         expect(self.page.locator("#headerMenuWrapper")).to_be_visible()
