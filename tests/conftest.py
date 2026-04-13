@@ -3,11 +3,9 @@ from dataclasses import dataclass
 
 import pytest
 from dotenv import load_dotenv
-from playwright.sync_api import Page
+from playwright.sync_api import Browser, Playwright
 
 from src.web.Application import Application
-from src.web.pages.HomePage import HomePage
-from src.web.pages.LoginPage import LoginPage
 
 load_dotenv()
 
@@ -20,56 +18,75 @@ class Config:
     password: str
 
 
+BROWSER_LAUNCH_ARGS = {
+    "headless": False,
+    "slow_mo": 150,
+    "timeout": 30000,
+}
+
+BROWSER_CONTEXT_ARGS = {
+    "base_url": os.getenv("BASE_APP_URL"),
+    "viewport": {"width": 1920, "height": 1080},
+    "locale": "uk-UA",
+    "timezone_id": "Europe/Kyiv",
+    "permissions": ["geolocation"],
+}
+
+
 @pytest.fixture(scope="session")
-def configs():
+def configs() -> Config:
     return Config(
-        base_url=os.getenv('BASE_URL'),
-        login_url=os.getenv('BASE_APP_URL'),
+        base_url=os.getenv("BASE_URL"),
+        login_url=os.getenv("BASE_APP_URL"),
         email=os.getenv("EMAIL"),
-        password=os.getenv("PASSWORD")
+        password=os.getenv("PASSWORD"),
     )
 
 
 @pytest.fixture(scope="session")
-def browser_type_launch_args(browser_type_launch_args: dict) -> dict:
-    return {
-        **browser_type_launch_args,
-        "headless": False,
-        "slow_mo": 150,
-        "timeout": 30000,
-    }
+def browser_instance(playwright: Playwright) -> Browser:
+    browser = playwright.chromium.launch(**BROWSER_LAUNCH_ARGS)
+    yield browser
+    browser.close()
 
 
 @pytest.fixture(scope="session")
-def browser_context_args(browser_context_args: dict) -> dict:
-    return {
-        **browser_context_args,
-        "base_url": "https://app.testomat.io",
-        "viewport": {"width": 1920, "height": 1080},
-        "locale": "uk-UA",
-        "timezone_id": "Europe/Kyiv",
-        # "record_video_dir": "videos/",
-        "permissions": ["geolocation"],
-    }
+def auth_state(browser_instance: Browser, configs: Config) -> dict:
+    ctx = browser_instance.new_context(**BROWSER_CONTEXT_ARGS)
+    page = ctx.new_page()
+
+    app = Application(page, configs.base_url)
+    app.home_page.open()
+    app.home_page.click_login()
+    app.login_page.login_user(configs.email, configs.password)
+    app.login_page.valid_message_visible()
+
+    storage = ctx.storage_state()
+    ctx.close()
+    return storage
 
 
 @pytest.fixture(scope="function")
-def app(page: Page, configs: Config) -> Application:
-    return Application(page, configs.base_url)
+def app(browser_instance: Browser, configs: Config) -> Application:
+    ctx = browser_instance.new_context(**BROWSER_CONTEXT_ARGS)
+    page = ctx.new_page()
+    yield Application(page, configs.base_url)
+    ctx.close()
 
 
-@pytest.fixture()
-def logged_in(page, configs: Config):
-    home_page = HomePage(page, configs.base_url)
-    home_page.open()
-    home_page.is_loaded()
-    home_page.click_login()
-
-    login_page = LoginPage(page)
-    login_page.is_loaded()
-    login_page.login(configs.email, configs.password)
+@pytest.fixture(scope="function")
+def logged_app(browser_instance: Browser, auth_state: dict, configs: Config) -> Application:
+    ctx = browser_instance.new_context(
+        **BROWSER_CONTEXT_ARGS,
+        storage_state=auth_state,
+    )
+    page = ctx.new_page()
+    page.goto(configs.login_url)
+    application = Application(page, configs.base_url)
+    yield application
+    ctx.close()
 
 
 @pytest.fixture
-def target_project():
+def target_project() -> str:
     return "python auto tests"

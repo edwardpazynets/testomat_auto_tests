@@ -7,7 +7,6 @@ class ProjectsPage:
 
     def is_loaded(self):
         expect(self.page.locator("#content-desktop").get_by_role("link", name="Create")).to_be_visible()
-        expect(self.page.locator(".common-flash-success", has_text="Signed in successfully")).to_be_visible()
 
     def search_project(self, TARGET_PROJECT: str):
         expect(self.page.get_by_role("searchbox", name='Search')).to_be_visible()

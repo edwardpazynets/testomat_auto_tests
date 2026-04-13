@@ -11,7 +11,7 @@ class LoginPage:
     def is_loaded(self):
         expect(self.page.locator("#content-desktop form#new_user")).to_be_visible()
 
-    def login(self, email: str, password: str):
+    def login_user(self, email: str, password: str):
         self.page.locator("#content-desktop #user_email").fill(email)
         self.page.locator("#content-desktop #user_password").fill(password)
         self.page.get_by_role("button", name='Sign in').click()
