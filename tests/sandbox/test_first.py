@@ -2,7 +2,9 @@ import pytest
 from faker import Faker
 from playwright.sync_api import Page, expect
 
-from tests.conftest import Config
+from src.config import Config
+
+pytestmark = pytest.mark.sandbox
 
 TARGET_PROJECT: str = "python auto tests"
 
@@ -24,8 +26,12 @@ def test_login_with_invalid_credentials(page: Page, configs: Config):
 
     login_user(page, configs.email, invalid_password)
 
-    expect(page.locator("#content-desktop").get_by_text("Invalid Email or password.")).to_be_visible()
-    expect(page.locator("#content-desktop .common-flash-info")).to_have_text("Invalid Email or password.")
+    expect(
+        page.locator("#content-desktop").get_by_text("Invalid Email or password.")
+    ).to_be_visible()
+    expect(page.locator("#content-desktop .common-flash-info")).to_have_text(
+        "Invalid Email or password."
+    )
 
 
 def test_search_project_in_company(page: Page, login):
@@ -49,7 +55,7 @@ def test_create_new_project(page: Page, login):
 
     page.locator("#content-desktop").get_by_role("link", name="Create", exact=False).click()
     page.locator("#project_title").fill(random_title)
-    page.get_by_role("button", name='Create', exact=True).click()
+    page.get_by_role("button", name="Create", exact=True).click()
 
     expect(page.get_by_text("Let's do some testing!")).to_be_visible(timeout=10000)
 
@@ -60,7 +66,7 @@ def test_delete_existing_project(page: Page, login, configs: Config):
 
     page.locator("#content-desktop").get_by_role("link", name="Create", exact=False).click()
     page.locator("#project_title").fill(project_to_delete)
-    page.get_by_role("button", name='Create', exact=True).click()
+    page.get_by_role("button", name="Create", exact=True).click()
     expect(page.get_by_text("Let's do some testing!")).to_be_visible(timeout=10000)
 
     page.goto(configs.login_url)
@@ -81,7 +87,7 @@ def test_delete_existing_project(page: Page, login, configs: Config):
 
 
 def search_for_project(page: Page, TARGET_PROJECT):
-    expect(page.get_by_role("searchbox", name='Search')).to_be_visible()
+    expect(page.get_by_role("searchbox", name="Search")).to_be_visible()
     page.locator("#content-desktop #search").fill(TARGET_PROJECT)
 
 
@@ -92,4 +98,4 @@ def open_home_page(page: Page, configs: Config):
 def login_user(page: Page, email: str, password: str):
     page.locator("#content-desktop #user_email").fill(email)
     page.locator("#content-desktop #user_password").fill(password)
-    page.get_by_role("button", name='Sign in').click()
+    page.get_by_role("button", name="Sign in").click()
