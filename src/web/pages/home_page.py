@@ -9,7 +9,7 @@ class HomePage:
     def open(self):
         self.page.goto(self.base_url)
 
-    def is_loaded(self):
+    def expect_loaded(self):
         expect(self.page.locator("#headerMenuWrapper")).to_be_visible()
         expect(self.page.locator(".side-menu .login-item")).to_have_text("Log in")
         expect(self.page.locator(".side-menu .start-item")).to_have_text("Start for free")

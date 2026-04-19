@@ -1,6 +1,6 @@
 from typing import Self
 
-from playwright.sync_api import expect, Page
+from playwright.sync_api import Page, expect
 
 
 class CreateNewProjectPage:
@@ -12,7 +12,7 @@ class CreateNewProjectPage:
         self.page.goto("/projects/new")
         return self
 
-    def is_loaded(self) -> Self:
+    def expect_loaded(self) -> Self:
         expect(self.__form_container).to_be_visible()
         expect(self.__form_container.locator("#classical")).to_be_visible()
         expect(self.__form_container.locator("#classical")).to_contain_text("Classical")
@@ -25,12 +25,14 @@ class CreateNewProjectPage:
         expect(self.page.get_by_text("New Project")).to_be_visible()
         return self
 
-    def create_new_project(self, random_project_title: str) -> Self:
-        self.__form_container.locator("#project_title").fill(random_project_title)
+    def fill_project_title(self, project_title: str) -> Self:
+        self.__form_container.locator("#project_title").fill(project_title)
         return self
 
-    def click_create(self) -> Self:
+    def click_create_project(self) -> Self:
         self.__form_container.locator("#project-create-btn input").click()
-        expect(self.__form_container.locator("#project-create-btn input")).to_be_hidden(timeout=10000)
+        expect(self.__form_container.locator("#project-create-btn input")).to_be_hidden(
+            timeout=10000
+        )
         self.page.wait_for_url("**/projects/**", timeout=10000)
         return self

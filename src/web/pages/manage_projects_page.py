@@ -14,5 +14,5 @@ class ManageProjectsPage:
         delete_button.wait_for(state="visible", timeout=10000)
         delete_button.click()
 
-    def open_manage_projects(self):
+    def click_manage_projects(self):
         self.page.get_by_role("link", name="Manage", exact=False).click()

@@ -26,7 +26,7 @@ class SideBar:
         self.projects = self.page.get_by_role("link", name="Projects")
         self.profile = self.page.get_by_role("link", name="Profile")
 
-    def is_loaded(self):
+    def expect_loaded(self):
         expect(self.logo).to_be_visible()
         expect(self.menu).to_be_visible()
         expect(self.tests).to_be_visible()
@@ -36,6 +36,6 @@ class SideBar:
     # def navigate_to(self, section: str):
     #     self.page.get_by_role("link", name=section).click()
 
-    def is_active(self, section: str):
+    def expect_section_active(self, section: str):
         link = self.menu.locator(f"a.nav-item:has-text('{section}')")
         expect(link).to_have_class(re.compile("active"))

@@ -1,20 +1,25 @@
-from playwright.sync_api import expect, Page
+import pytest
+from playwright.sync_api import Page, expect
 
-from src.web.Application import Application
-from tests.conftest import Config
+from src.config import Config
+from src.web.application import Application
+
+pytestmark = pytest.mark.sandbox
 
 
 def test_login_example(app: Application, configs: Config) -> None:
     page = app.page
     app.home_page.open()
     app.home_page.click_login()
-    app.login_page.is_loaded()
+    app.login_page.expect_loaded()
 
     page.get_by_role("textbox", name="name@email.com").fill(configs.email)
     page.locator("#content-desktop").locator("#user_password").fill("invalid_password_123")
     page.get_by_role("button", name="Sign in").click()
 
-    expect(page.locator("#content-desktop").get_by_text("Invalid Email or password.")).to_be_visible()
+    expect(
+        page.locator("#content-desktop").get_by_text("Invalid Email or password.")
+    ).to_be_visible()
 
     # codegen version
 
