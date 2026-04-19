@@ -1,3 +1,25 @@
+[project]
+name = "testomat-auto-tests"
+version = "0.1.0"
+description = "UI automation tests for Testomat"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "faker==40.12.0",
+    "playwright==1.58.0",
+    "pytest==9.0.2",
+    "pytest-html==4.2.0",
+    "pytest-playwright==0.7.2",
+    "python-dotenv==1.2.2",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.0.0",
+    "pre-commit>=4.0.0",
+    "ruff>=0.13.0",
+]
+
 [tool.black]
 line-length = 100
 target-version = ["py312"]
