@@ -1,0 +1,86 @@
+from collections.abc import Iterator
+
+import pytest
+from playwright.sync_api import Browser, BrowserContext, Cookie, Page
+
+from tests.fixtures.browser import build_browser_context
+from tests.fixtures.config import Config
+
+
+class CookieHelper:
+    def __init__(self, context: BrowserContext):
+        self.context = context
+
+    def add(
+        self,
+        name: str,
+        value: str,
+        domain: str,
+        path: str = "/",
+        *,
+        http_only: bool = False,
+        secure: bool = False,
+        same_site: str = "Lax",
+        expires: float | None = None,
+    ) -> None:
+        cookie: Cookie = {
+            "name": name,
+            "value": value,
+            "domain": domain,
+            "path": path,
+            "httpOnly": http_only,
+            "secure": secure,
+            "sameSite": same_site,
+        }
+        if expires is not None:
+            cookie["expires"] = expires
+        self.context.add_cookies([cookie])
+
+    def add_many(self, cookies: list[Cookie]) -> None:
+        self.context.add_cookies(cookies)
+
+    def get_all(self, urls: list[str] | None = None) -> list[Cookie]:
+        return self.context.cookies(urls) if urls else self.context.cookies()
+
+    def get(self, name: str) -> Cookie | None:
+        for cookie in self.context.cookies():
+            if cookie["name"] == name:
+                return cookie
+        return None
+
+    def get_value(self, name: str) -> str | None:
+        cookie = self.get(name)
+        return cookie["value"] if cookie else None
+
+    def exists(self, name: str) -> bool:
+        return self.get(name) is not None
+
+    def clear_all(self) -> None:
+        self.context.clear_cookies()
+
+    def clear(
+        self,
+        *,
+        name: str | None = None,
+        domain: str | None = None,
+        path: str | None = None,
+    ) -> None:
+        self.context.clear_cookies(name=name, domain=domain, path=path)
+
+
+def clear_browser_state(page: Page) -> None:
+    """Clear cookies and browser storage for a page."""
+    page.context.clear_cookies()
+    try:
+        page.evaluate("window.localStorage.clear()")
+        page.evaluate("window.sessionStorage.clear()")
+    except Exception:
+        pass
+
+
+@pytest.fixture(scope="function")
+def cookies(browser_instance: Browser, config: Config) -> Iterator[CookieHelper]:
+    context = build_browser_context(browser_instance, config.app_base_url)
+    helper = CookieHelper(context)
+    yield helper
+    context.close()

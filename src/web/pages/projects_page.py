@@ -1,14 +1,21 @@
 from playwright.sync_api import Page, expect
 
+from ..components.project_page_header import ProjectsPageHeader
+
 
 class ProjectsPage:
     def __init__(self, page: Page):
         self.page = page
+        self.header = ProjectsPageHeader(page)
 
     def expect_loaded(self):
         expect(
             self.page.locator("#content-desktop").get_by_role("link", name="Create", exact=True)
         ).to_be_visible()
+
+    def open(self):
+        self.page.goto("/projects")
+        return self
 
     def search_project(self, target_project: str):
         expect(self.page.get_by_role("searchbox", name="Search")).to_be_visible()

@@ -1,62 +1,30 @@
 import os
+from pathlib import Path
 
-import pytest
-from dotenv import load_dotenv
-from playwright.sync_api import Browser, BrowserContext, Playwright
+from playwright.sync_api import Browser, BrowserContext
 
-load_dotenv()
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+VIDEO_DIR = PROJECT_ROOT / "videos"
 
-BROWSER_LAUNCH_ARGS = {
-    "headless": False,
-    "slow_mo": 150,
-    "timeout": 30000,
+BROWSER_CONTEXT_ARGS = {
+    "base_url": os.getenv("BASE_APP_URL"),
+    "viewport": {"width": 1320, "height": 980},
+    "locale": "uk-UA",
+    "timezone_id": "Europe/Kyiv",
+    # "record_video_dir": str(VIDEO_DIR),
+    "permissions": ["geolocation"],
 }
 
 
-def _browser_context_args() -> dict:
-    base_app_url = os.getenv("BASE_APP_URL")
-    if not base_app_url:
-        raise RuntimeError("BASE_APP_URL is not set. Check your .env file.")
-
-    return {
-        "base_url": base_app_url,
-        "viewport": {"width": 1920, "height": 1080},
-        "locale": "uk-UA",
-        "timezone_id": "Europe/Kyiv",
-        "permissions": ["geolocation"],
+def build_browser_context(
+    browser: Browser,
+    base_url: str,
+    storage_state_path: Path | None = None,
+) -> BrowserContext:
+    kwargs = {
+        **BROWSER_CONTEXT_ARGS,
+        "base_url": base_url,
     }
-
-
-@pytest.fixture(scope="session")
-def browser_instance(playwright: Playwright) -> Browser:
-    browser = playwright.chromium.launch(**BROWSER_LAUNCH_ARGS)
-    yield browser
-    browser.close()
-
-
-@pytest.fixture(scope="session")
-def shared_context(browser_instance: Browser) -> BrowserContext:
-    ctx = browser_instance.new_context(**_browser_context_args())
-    ctx.new_page()
-    yield ctx
-    ctx.close()
-
-
-@pytest.fixture(scope="session")
-def logged_context(browser_instance: Browser) -> BrowserContext:
-    ctx = browser_instance.new_context(**_browser_context_args())
-    ctx.new_page()
-    yield ctx
-    ctx.close()
-
-
-def clear_browser_state(context: BrowserContext) -> None:
-    for page in context.pages:
-        try:
-            page.evaluate("localStorage.clear()")
-            page.evaluate("sessionStorage.clear()")
-        except Exception:
-            pass
-    for page in context.pages:
-        page.goto("about:blank")
-    context.clear_cookies()
+    if storage_state_path and storage_state_path.exists():
+        kwargs["storage_state"] = str(storage_state_path)
+    return browser.new_context(**kwargs)

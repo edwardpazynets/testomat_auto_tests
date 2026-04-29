@@ -1,3 +1,5 @@
+from ..components.test_for_suite_popup import TestForSuitePopup
+from ..components.test_modal import TestModal
 from .create_new_project_page import CreateNewProjectPage
 from .home_page import HomePage
 from .login_page import LoginPage
@@ -12,4 +14,6 @@ __all__ = [
     "ManageProjectsPage",
     "ProjectDetailPage",
     "ProjectsPage",
+    "TestForSuitePopup",
+    "TestModal",
 ]
