@@ -11,6 +11,7 @@ dependencies = [
     "pytest-html==4.2.0",
     "pytest-playwright==0.7.2",
     "python-dotenv==1.2.2",
+    "selenium>=4.43.0",
 ]
 
 [dependency-groups]
