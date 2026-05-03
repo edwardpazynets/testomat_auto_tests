@@ -1,8 +1,7 @@
 import pytest
 from faker import Faker
 from playwright.sync_api import Page, expect
-
-from src.config import Config
+from src.tests.fixures import Config
 
 pytestmark = pytest.mark.sandbox
 

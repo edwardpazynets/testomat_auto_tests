@@ -15,7 +15,7 @@ def test_search_project_in_company(logged_app: Application, target_project):
 
 @pytest.mark.web
 @pytest.mark.smoke
-def test_delete_existing_project(logged_app: Application, configs):
+def test_delete_existing_project(logged_app: Application, config):
     faker = Faker()
     project_to_delete = f"Deleted project {faker.word()}"
     page = logged_app.page
@@ -29,7 +29,7 @@ def test_delete_existing_project(logged_app: Application, configs):
 
     expect(page.get_by_text("Let's do some testing!")).to_be_visible(timeout=10000)
 
-    page.goto(configs.login_url)
+    page.goto(config.app_base_url)
     logged_app.manage_page.click_manage_projects()
 
     page.on("dialog", lambda dialog: dialog.accept())

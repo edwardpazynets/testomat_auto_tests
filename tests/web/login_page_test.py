@@ -35,8 +35,12 @@ def test_login_invalid(app: Application, email: str, password: str):
     app.login_page.expect_loaded()
     app.login_page.login_as(email, password)
     app.login_page.expect_invalid_login_message()
+    app.page.wait_for_timeout(2000)
 
 
 @pytest.mark.smoke
-def test_login_with_valid_creds(logged_app: Application):
-    logged_app.projects_page.expect_loaded()
+def test_login_with_valid_creds(app: Application, config):
+    app.login_page.open()
+    app.login_page.expect_loaded()
+    app.login_page.login_as(config.email, config.password)
+    app.projects_page.expect_loaded()

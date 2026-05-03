@@ -1,3 +1,1 @@
-from .application import Application
-
-__all__ = ["Application"]
+"""Web page objects package."""

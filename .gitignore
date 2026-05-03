@@ -2,7 +2,7 @@
 .venv/
 .env
 __pycache__/
-test-result
+test_result
 .pytest_cache
-videos
+test_result/videos
 .pre-commit-cache/

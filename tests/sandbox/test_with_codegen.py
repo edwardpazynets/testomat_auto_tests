@@ -1,7 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
-
 from src.config import Config
+
 from src.web.application import Application
 
 pytestmark = pytest.mark.sandbox
@@ -30,14 +30,5 @@ def test_example(page: Page) -> None:
 
     page.get_by_role("link", name="Log in").click()
 
-    expect(page.get_by_role("heading", name="Test Management System for")).to_be_visible()
 
-    page.get_by_role("textbox", name="name@email.com").click()
-    page.get_by_role("textbox", name="name@email.com").fill("edwardpazynets@gmail.com")
-    page.get_by_role("textbox", name="name@email.com").press("Tab")
-    page.get_by_role("textbox", name="********").fill("Qwerty77")
-    page.get_by_role("checkbox").check()
-    page.get_by_role("button", name="Sign In").click()
-    expect(page.get_by_role("heading", name="Test Management System for")).to_be_visible()
-
-    page.locator("#content-desktop").get_by_text("Invalid Email or password.").click()
+pytest.skip("Sandbox tests are disabled; use web tests only.", allow_module_level=True)
